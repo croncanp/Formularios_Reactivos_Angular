@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {ValidatorsService} from '../../../shared/service/validators.service';
 
 @Component({
   templateUrl: './dynamic-page.component.html',
@@ -7,7 +8,7 @@ import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angul
 })
 export class DynamicPageComponent {
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private formBuilder: FormBuilder, private validatorService: ValidatorsService ) {
   }
 
   public form: FormGroup = this.formBuilder.group({
@@ -34,21 +35,12 @@ export class DynamicPageComponent {
   }
 
   isValidField(fieldName: string): null | boolean {
-    return this.form.controls[fieldName].errors && this.form.controls[fieldName].touched;
+    return this.validatorService.isValidField(this.form, fieldName);
   }
 
   // Manejo de errores del formulario utilizando ValidationErrors
   getFieldError(fieldName: string): string | null {
-    if (!this.form.contains(fieldName)) return null;
-    const errors = this.form.controls[fieldName].errors || {};
-
-    for (const key of Object.keys(errors)) {
-      switch (key){
-        case 'required': return 'Este campo es requerido';
-        case 'minlength': return `Este campo es debe terner minimo ${errors['minlength'].requiredLength} caracteres`;
-      }
-    }
-    return '';
+    return this.validatorService.getFieldError(this.form, fieldName);
   }
 
   isValidFieldInArray(formArray: FormArray, index: number): boolean | null {

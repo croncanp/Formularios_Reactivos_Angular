@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from 'express';
+import {ValidatorsService} from '../../../shared/service/validators.service';
 
 const initializateForm = {
   name: '',
@@ -20,28 +21,19 @@ export class BasicPageComponent implements OnInit{
     price: new FormControl(0),
     inStorage: new FormControl(0)
   });*/
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder, private validatorService: ValidatorsService) { }
 
   ngOnInit(): void {
     this.myForm.reset(initializateForm);
   }
 
   isValidField(fieldName: string): null | boolean {
-    return this.myForm.controls[fieldName].errors && this.myForm.controls[fieldName].touched;
+    return this.validatorService.isValidField(this.myForm, fieldName);
   }
 
   // Manejo de errores del formulario utilizando ValidationErrors
   getFieldError(fieldName: string): string | null {
-    if (!this.myForm.contains(fieldName)) return null;
-    const errors = this.myForm.controls[fieldName].errors || {};
-
-    for (const key of Object.keys(errors)) {
-      switch (key){
-        case 'required': return 'Este campo es requerido';
-        case 'minlength': return `Este campo es debe terner minimo ${errors['minlength'].requiredLength} caracteres`;
-      }
-    }
-    return '';
+    return this.validatorService.getFieldError(this.myForm, fieldName);
   }
 
   // Esta es otra manera de trabajar con formularios reactivos y se incluyen las validaciones con el obj validators
